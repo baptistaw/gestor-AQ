@@ -1,0 +1,33 @@
+{
+  "name": "gestor-de-consentimiento-de-anestesia",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Anesthesia‑consent manager. Comandos se lanzan desde esta raíz.",
+  "scripts": {
+    /* -------- dependencias -------- */
+    "install:backend": "npm install --prefix backend",
+
+    /* -------- desarrollo -------- */
+    "dev:backend": "npm --prefix backend run dev",
+    "dev": "npm run dev:backend",
+
+    /* -------- build / producción -------- */
+    "build:backend": "npm --prefix backend run build",
+    "start:backend": "npm --prefix backend run start",
+
+    /* -------- Prisma / base de datos -------- */
+    "db:seed": "npm --prefix backend run db:seed",
+    "db:migrate:deploy": "npm --prefix backend run db:migrate:deploy",
+    "db:migrate:dev": "npm --prefix backend run db:migrate:dev"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "qrcode.react": "^4.2.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17"
+  }
+}

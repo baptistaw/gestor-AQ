@@ -1,0 +1,65 @@
+# Backend para el Gestor de Consentimiento de Anestesia
+
+Este directorio contiene el servidor backend para la aplicación, construido con Node.js, Express y Prisma. Ha sido configurado para su despliegue en un entorno de producción.
+
+## 1. Arquitectura y Tecnologías
+
+- **Runtime:** Node.js
+- **Framework:** Express.js
+- **ORM:** Prisma
+- **Base de Datos:** Preparado para **PostgreSQL**.
+- **Envío de Correo:** Nodemailer (para enviar consentimientos por email).
+- **Módulos:** Configurado para usar Módulos ES (`"type": "module"`).
+
+## 2. Guía de Instalación y Ejecución Local
+
+Para el desarrollo local, se recomienda ejecutar todos los comandos desde la **carpeta raíz del proyecto**, no desde esta carpeta `backend/`. Por favor, consulta la sección "Desarrollo y Mantenimiento Local" en el `README.md` principal para obtener instrucciones detalladas y actualizadas.
+
+Los scripts en este `package.json` están diseñados para ser llamados desde el `package.json` de la raíz. Si por alguna razón necesitas ejecutarlos directamente desde esta carpeta, los comandos son:
+
+1.  **Instalar Dependencias:** `npm install`
+2.  **Crear archivo `.env`:** Copia `.env.example` a `.env` y añade tus credenciales.
+    - Para `DATABASE_URL`, si desarrollas localmente contra una base de datos de Render, **debes usar la "External Database URL"** que proporciona Render, no la interna.
+    - Para las variables `EMAIL_*`, añade las credenciales de tu proveedor de SMTP.
+3.  **Migrar Base de Datos:** `npx prisma migrate deploy`
+4.  **Cargar PDFs y Datos de Prueba:** Coloca tus archivos de consentimiento en `backend/uploads/surgical` y `backend/uploads/anesthesia`, luego ejecuta `npm run db:seed`.
+5.  **Ejecutar Servidor:** `npm run dev`
+
+## 3. Despliegue en Render
+
+El proyecto está listo para ser desplegado en [Render](https://render.com/).
+
+1.  **Crea una base de datos PostgreSQL en Render.** Copia la "Internal Database URL".
+2.  **Crea un nuevo "Web Service" en Render** y conéctalo a tu repositorio de GitHub.
+3.  **Configura el servicio:**
+    - **Root Directory:** `backend`
+    - **Build Command:** `sh ./render-build.sh`
+    - **Start Command:** `npm start`
+4.  **Añade las variables de entorno:**
+    - **Key:** `DATABASE_URL`, **Value:** Pega la "Internal Database URL" de tu base de datos de Render.
+    - **Key:** `API_KEY`, **Value:** Pega tu clave de API de Google Gemini.
+    - **Keys para Email:** `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASS`, `EMAIL_FROM`, `EMAIL_FROM_NAME`. Rellena los valores con tus credenciales de correo.
+5. **Poblar la base de datos de producción**: Después del primer despliegue, necesitarás cargar tus formularios PDF. La forma más sencilla es ejecutar el `seed` localmente apuntando a la base de datos de producción (usando la "External Database URL" en tu `.env` local) y luego ejecutar `npm run db:seed` desde tu máquina.
+
+El script `render-build.sh` se encargará de instalar dependencias y aplicar las migraciones de la base de datos.
+
+Para una guía más detallada, consulta el `README.md` principal del proyecto.
+
+## 4. Troubleshooting
+
+### Error: `Can't reach database server at ...`
+
+Este es un error de conexión común cuando se intenta ejecutar un comando local (`db:seed`, `db:migrate:dev`) que necesita acceder a la base de datos de Render. Las causas pueden ser:
+
+1.  **Base de Datos Suspendida (Plan Gratuito):**
+    - **Causa:** Las bases de datos en el plan gratuito de Render se suspenden automáticamente después de un período de inactividad.
+    - **Solución:** Ve a tu panel de control de Render, navega hasta tu base de datos PostgreSQL y haz clic en el botón "Resume" si está suspendida. Espera unos 30 segundos a que esté activa e intenta ejecutar el comando de nuevo.
+
+2.  **Falta de `?sslmode=require` en la `DATABASE_URL`:**
+    - **Causa:** Render requiere conexiones SSL seguras desde fuera de su red. Esto se debe especificar en la URL de conexión.
+    - **Solución:** Abre tu archivo `backend/.env`. Asegúrate de que estás utilizando la **"External Database URL"** y de que la cadena de conexión termina exactamente con `?sslmode=require`.
+    - **Ejemplo:** `postgresql://tu_usuario:tu_pass@tu_host.render.com/tu_db?sslmode=require`
+
+3.  **Restricciones de Acceso (Firewall):**
+    - **Causa:** Por defecto, Render podría restringir las conexiones a tu base de datos solo desde IPs específicas.
+    - **Solución:** En el panel de Render, ve a tu base de datos, busca la sección "Access Control" o "Connections". Asegúrate de que "Allow connections from anywhere" esté seleccionado o añade tu dirección IP pública actual a la lista de IPs permitidas.

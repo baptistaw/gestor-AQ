@@ -1,0 +1,26 @@
+{
+  "name": "gestor-de-consentimiento-de-anestesia",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Anesthesia Consent Manager application. Run commands from this root directory.",
+  "scripts": {
+    "install:backend": "npm install --prefix backend",
+    "dev": "npm run dev --prefix backend",
+    "build:backend": "npm run build --prefix backend",
+    "start:backend": "npm run start --prefix backend",
+    "db:seed": "npm run db:seed --prefix backend",
+    "db:migrate:deploy": "npm run db:migrate:deploy --prefix backend",
+    "db:migrate:dev": "npm run db:migrate:dev --prefix backend"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "qrcode.react": "^4.2.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17"
+  }
+  
+}

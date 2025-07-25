@@ -1,0 +1,6 @@
+/* frontend/src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* (opcional) tus utilidades o overrides aquí */

@@ -1,0 +1,123 @@
+// ======================================================================
+//  Prisma schema — Gestor de Consentimientos
+// ======================================================================
+
+// ---------- Generador del cliente ----------
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ---------- Fuente de datos ----------
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ======================================================================
+//  ENUMS
+// ======================================================================
+
+enum ConsentType {
+  SURGICAL
+  ANESTHESIA
+}
+
+// ======================================================================
+//  MODELOS
+// ======================================================================
+
+// ----------------------------------------------------------------------
+//  ConsentForm – almacena los PDFs de consentimientos
+// ----------------------------------------------------------------------
+model ConsentForm {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  fileName      String
+  fileContent   Bytes
+  type          ConsentType
+
+  // Relaciones inversas (no obligatorias en Patient)
+  surgicalPatients   Patient[] @relation("SurgicalConsent")
+  anesthesiaPatients Patient[] @relation("AnesthesiaConsent")
+}
+
+// ----------------------------------------------------------------------
+//  Surgeon – cirujano
+// ----------------------------------------------------------------------
+model Surgeon {
+  id                        String   @id @default(cuid())
+  firstName                 String
+  lastName                  String
+  professionalLicenseNumber String   @unique
+  password                  String        // (hash en prod)
+  specialty                 String
+
+  patients                  Patient[]
+}
+
+// ----------------------------------------------------------------------
+//  Anesthesiologist – anestesiólogo
+// ----------------------------------------------------------------------
+model Anesthesiologist {
+  id                        String   @id @default(cuid())
+  firstName                 String
+  lastName                  String
+  professionalLicenseNumber String   @unique
+  password                  String
+
+  patients                  Patient[]
+}
+
+// ----------------------------------------------------------------------
+//  Patient – paciente
+// ----------------------------------------------------------------------
+model Patient {
+  id                       String   @id @default(cuid())
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  // --- Datos personales ---
+  firstName                String
+  lastName                 String
+  email                    String
+  cedula                   String
+  dateOfBirth              DateTime
+  sex                      String
+
+  // --- Consentimiento quirúrgico ---
+  surgicalProcedure        String?
+  surgeryDateTime          DateTime?
+  surgicalSignatureImage   String?
+  surgicalSignedDate       DateTime?
+
+  // --- Consentimiento de anestesia ---
+  anesthesiaInstructions   String?
+  medicationToSuspend      String[] @default([])   // array de textos
+  anesthesiaSignatureImage String?
+  anesthesiaSignedDate     DateTime?
+
+  // --- Ayuno ---
+  isInfant                 Boolean  @default(false)
+  fastingSolids            String?
+  fastingClearLiquids      String?
+  fastingCowMilk           String?
+  fastingBreastMilk        String?
+
+  // --- Relaciones 1‑N con profesionales ---
+  surgeonId                String?
+  surgeon                  Surgeon? @relation(fields: [surgeonId], references: [id])
+
+  anesthesiologistId       String?
+  anesthesiologist         Anesthesiologist? @relation(fields: [anesthesiologistId], references: [id])
+
+  // --- Relaciones 1‑1 con formularios PDF ---
+  surgicalConsentId        String?  @unique
+  surgicalConsent          ConsentForm? @relation("SurgicalConsent",   fields: [surgicalConsentId],   references: [id])
+
+  anesthesiaConsentId      String?  @unique
+  anesthesiaConsent        ConsentForm? @relation("AnesthesiaConsent", fields: [anesthesiaConsentId], references: [id])
+
+  // --- Índices ---
+  @@unique([email, cedula])
+}

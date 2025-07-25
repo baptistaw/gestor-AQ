@@ -1,0 +1,11 @@
+{
+  "name": "gestor-de-consentimiento-de-anestesia",
+  "private": true,
+  "workspaces": ["backend"],
+  "scripts": {
+    "install:backend": "npm install --workspace backend",
+    "dev": "npm run dev --workspace backend",
+    "build": "npm run build --workspace backend",
+    "start": "npm run start --workspace backend"
+  }
+}

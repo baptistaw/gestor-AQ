@@ -1,0 +1,155 @@
+//──────────────────────────────────────────────────────────────
+//  Prisma ORM – esquema completo (Gestor AQ)
+//──────────────────────────────────────────────────────────────
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//──────────────────────────────────────────────────────────────
+//  Modelos de usuarios
+//──────────────────────────────────────────────────────────────
+model Surgeon {
+  id                        String    @id @default(cuid())
+  firstName                 String
+  lastName                  String
+  professionalLicenseNumber String    @unique
+  password                  String
+  specialty                 String
+  providers HealthProvider[] @relation("SurgeonProviders")
+  patients                  Patient[]
+  phone                     String?
+  cedula                    String?  @unique
+  address                   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Anesthesiologist {
+  id                        String    @id @default(cuid())
+  firstName                 String
+  lastName                  String
+  professionalLicenseNumber String    @unique
+  password                  String
+  patients                  Patient[]
+  phone                     String?
+  cedula                    String?  @unique
+  address                   String?
+  providers HealthProvider[] @relation("AnesthesiologistProviders")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+//──────────────────────────────────────────────────────────────
+//  Formulario PDF genérico (quirúrgico / anestesia)
+//──────────────────────────────────────────────────────────────
+enum ConsentType {
+  SURGICAL
+  ANESTHESIA
+}
+
+model ConsentForm {
+  id         String      @id @default(cuid())
+  fileName   String
+  filePath   String
+  fileSize   Int
+  uploadedAt DateTime    @default(now())
+  type       ConsentType
+
+  // relaciones inversas
+  surgicalPatients   Patient[] @relation("SurgicalConsent")
+  anesthesiaPatients Patient[] @relation("AnesthesiaConsent")
+}
+
+//──────────────────────────────────────────────────────────────
+//  Paciente
+//──────────────────────────────────────────────────────────────
+model Patient {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //── Información personal
+  firstName   String
+  lastName    String
+  email       String
+  cedula      String
+  dateOfBirth DateTime
+  sex         String
+  provider     HealthProvider @relation(fields: [providerId], references: [id])
++  providerId   String
+  isInfant    Boolean  @default(false)
+
+  //── Rel. profesionales
+  surgeonId          String?
+  surgeon            Surgeon?          @relation(fields: [surgeonId], references: [id])
+  anesthesiologistId String?
+  anesthesiologist   Anesthesiologist? @relation(fields: [anesthesiologistId], references: [id])
+
+  //── Cirugía
+  surgicalProcedure      String?
+  surgeryDateTime        DateTime?
+  surgicalConsentId      String?      @unique
+  surgicalConsent        ConsentForm? @relation("SurgicalConsent", fields: [surgicalConsentId], references: [id])
+  surgicalSignatureImage String?
+  surgicalSignedDate     DateTime?
+
+  //── Consentimiento anestesia
+  anesthesiaConsentId      String?      @unique
+  anesthesiaConsent        ConsentForm? @relation("AnesthesiaConsent", fields: [anesthesiaConsentId], references: [id])
+  anesthesiaSignatureImage String?
+  anesthesiaSignedDate     DateTime?
+
+  //── Plan de ayuno (1‑a‑1) y suspensiones (1‑a‑n)
+  fastingPlan FastingPlan?
+  suspensions Suspension[]
+
+  //── Otros
+  anesthesiaInstructions String?
+  medicationToSuspend    String[] @default([]) // campo legacy; mantén si lo usas
+
+  //── Índices / claves compuestas
+  @@unique([email, cedula])
+}
+
+//──────────────────────────────────────────────────────────────
+//  Plan de ayuno (1‑a‑1 con Patient)
+//──────────────────────────────────────────────────────────────
+model FastingPlan {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // FK a Patient (única ⇒ relación 1‑a‑1)
+  patient   Patient @relation(fields: [patientId], references: [id])
+  patientId String  @unique
+
+  // Parámetros de ayuno
+  isInfant          Boolean @default(false)
+  solidsHours       Int? // p. ej. 8
+  clearLiquidsHours Int? // p. ej. 2
+  cowMilkHours      Int?
+  breastMilkHours   Int?
+}
+
+//──────────────────────────────────────────────────────────────
+//  Suspensión de Medicamentos (n‑a‑1 con Patient)
+//──────────────────────────────────────────────────────────────
+model Suspension {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  medicationName String
+  suspendAt      DateTime
+  resumeAt       DateTime?
+
+  // FK paciente
+  patient   Patient @relation(fields: [patientId], references: [id])
+  patientId String // ❶ ← quita @index
+
+  @@index([patientId]) // ❷ ← añade esta línea
+}

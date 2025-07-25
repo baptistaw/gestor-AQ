@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Las guías del proyecto especifican PostgreSQL para producción.
+// Esta configuración usa una variable de entorno, lo cual es correcto
+// para desarrollo local (con SQLite o Postgres) y producción.
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Patient {
+  id                         String    @id @default(cuid())
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime  @updatedAt
+
+  // Información Personal
+  firstName                  String
+  lastName                   String
+  email                      String
+  cedula                     String    
+  dateOfBirth                DateTime
+  sex                        String
+
+  // Información del Consentimiento Quirúrgico
+  surgicalConsentPDFName     String?
+  surgicalProcedure          String?
+  surgeryDateTime            DateTime?
+  surgeonId                  String?   // Corresponde a los IDs de los datos de prueba por ahora
+  surgicalSignatureImage     String?   // Almacena la imagen de la firma en base64
+  surgicalSignedDate         DateTime?
+
+  // Información del Consentimiento de Anestesia
+  anesthesiaConsentPDFName   String?
+  anesthesiaInstructions     String?
+  medicationToSuspend        String[]  @default([])
+  anesthesiologistId         String?   // Corresponde a los IDs de los datos de prueba por ahora
+  anesthesiaSignatureImage   String?   // Almacena la imagen de la firma en base64
+  anesthesiaSignedDate       DateTime?
+
+  // Instrucciones de ayuno (aplanadas en el modelo según el código del backend)
+  isInfant                   Boolean   @default(false)
+  fastingSolids              String?
+  fastingClearLiquids        String?
+  fastingCowMilk             String?
+  fastingBreastMilk          String?
+  
+  // Relaciones con los profesionales
+  // Aunque el backend actual usa datos de prueba (mocks), el esquema debe ser correcto.
+  surgeon                    Surgeon?  @relation(fields: [surgeonId], references: [id])
+  anesthesiologist           Anesthesiologist? @relation(fields: [anesthesiologistId], references: [id])
+  
+  // Índice único para el inicio de sesión del paciente
+  @@unique([email, cedula])
+}
+
+// NOTA: El backend actual usa DATOS DE PRUEBA (mocks) para los profesionales.
+// Estos modelos se definen para una futura implementación más robusta
+// y para satisfacer las relaciones de clave externa en el modelo Patient.
+// Sería necesario poblar estas tablas y cambiar la lógica del backend
+// para usarlas en lugar de los arreglos de prueba.
+model Surgeon {
+  id                      String    @id @default(cuid())
+  firstName               String
+  lastName                String
+  professionalLicenseNumber String    @unique
+  password                String    // En una app real, esto debería ser un hash
+  specialty               String
+  
+  patients                Patient[]
+}
+
+model Anesthesiologist {
+  id                      String    @id @default(cuid())
+  firstName               String
+  lastName                String
+  professionalLicenseNumber String    @unique
+  password                String    // En una app real, esto debería ser un hash
+  
+  patients                Patient[]
+}
+

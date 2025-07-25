@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Anesthesia Consent Manager</title>
+
+    <!-- ✅ Hoja de estilos purgada/minificada que generaste con Tailwind -->
+    <link rel="stylesheet" href="/dist/tailwind.css" />
+
+    <!-- Import‑map para los módulos ESM que el navegador cargará -->
+    <script type="importmap">
+    {
+      "imports": {
+        /*  React 18+/19  */
+        "react":                 "https://esm.sh/react@19.1.0",
+        "react/jsx-runtime":     "https://esm.sh/react@19.1.0/jsx-runtime",
+        "react/jsx-dev-runtime": "https://esm.sh/react@19.1.0/jsx-dev-runtime",
+
+        "react-dom":             "https://esm.sh/react-dom@19.1.0",
+        "react-dom/client":      "https://esm.sh/react-dom@19.1.0/client",
+
+        /*  Otros paquetes del front  */
+        "qrcode.react":          "https://esm.sh/qrcode.react@3.1.0",
+        "@google/genai":         "https://esm.sh/@google/genai@0.12.0",
+
+        /*  (Opcionales) – Si algún componente del front los usa directamente:  */
+        "process":               "https://esm.sh/process@0.11.10",
+        "path":                  "https://esm.sh/path-browserify@1.0.1"
+      }
+    }
+    </script>
+  </head>
+
+  <body class="bg-slate-50 text-slate-800 antialiased">
+    <!-- React montará aquí la SPA -->
+    <div id="root"></div>
+
+    <!-- Configuración global que necesite tu frontend (si existe) -->
+    <script src="/config.js"></script>
+
+    <!-- Punto de entrada de React (compilado a ESM por Babel/TS) -->
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

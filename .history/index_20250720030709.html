@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Anesthesia Consent Manager</title>
+
+    <!-- Tailwind compilado -->
+<!-- index.html corregido (solo se muestra la línea clave) -->
+    <link rel="stylesheet" href="/frontend/dist/tailwind.css" />
+
+
+    <!-- Import‑map (JSON VÁLIDO, sin comas finales) -->
+    <script type="importmap">
+      {
+        "imports": {
+          "react":           "https://esm.sh/react@19.1.0",
+          "react/":          "https://esm.sh/react@19.1.0/",
+          "react-dom/":      "https://esm.sh/react-dom@19.1.0/",
+          "qrcode.react":    "https://esm.sh/qrcode.react@3.1.0"
+        }
+      }
+    </script>
+  </head>
+
+  <body class="bg-slate-50 text-slate-800 antialiased">
+    <div id="root"></div>
+
+    <!-- ← DEBE cargarse antes que tu bundle para exponer window.APP_CONFIG -->
+    <script src="/config.js"></script>
+
+    <!-- Punto de entrada de tu SPA (compilado con esbuild / ts‑server) -->
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

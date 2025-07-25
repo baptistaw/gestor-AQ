@@ -1,0 +1,8 @@
+
+{
+  "name": "Gestor de Consentimiento de Anestesia",
+  "description": "Una aplicación web para que los anestesiólogos gestionen digitalmente los formularios de consentimiento de los pacientes. Los pacientes pueden ver, firmar con una foto de su firma y enviar los consentimientos.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
