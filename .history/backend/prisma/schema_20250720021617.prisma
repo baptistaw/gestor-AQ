@@ -1,0 +1,109 @@
+// -------------------------------------------------------------
+//  Prisma Schema – Gestor AQ  (copiar todo el archivo)
+// -------------------------------------------------------------
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/////////////////////////  MODELOS  /////////////////////////////
+
+model ConsentForm {
+  id          String      @id @default(cuid())
+  createdAt   DateTime    @default(now())
+  fileName    String
+  fileContent Bytes
+  type        ConsentType
+
+  /// pacientes que lo usan como consentimiento quirúrgico
+  surgicalPatients   Patient[] @relation("SurgicalConsent")
+
+  /// pacientes que lo usan como consentimiento de anestesia
+  anesthesiaPatients Patient[] @relation("AnesthesiaConsent")
+}
+
+model Surgeon {
+  id                        String    @id @default(cuid())
+  firstName                 String
+  lastName                  String
+  professionalLicenseNumber String    @unique
+  password                  String
+  specialty                 String
+  patients                  Patient[]
+}
+
+model Anesthesiologist {
+  id                        String    @id @default(cuid())
+  firstName                 String
+  lastName                  String
+  professionalLicenseNumber String    @unique
+  password                  String
+  patients                  Patient[]
+}
+
+model Patient {
+  id                       String   @id @default(cuid())
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  // ───── Datos personales ─────
+  firstName                String
+  lastName                 String
+  email                    String
+  cedula                   String
+  dateOfBirth              DateTime
+  sex                      String
+
+  // ───── Cirugía y consentimiento quirúrgico ─────
+  surgicalProcedure        String?
+  surgeryDateTime          DateTime?
+  surgeonId                String?
+  surgicalSignatureImage   String?
+  surgicalSignedDate       DateTime?
+
+  // formulario PDF (relación 1‑a‑1 opcional)
+  surgicalConsentId        String?   @unique
+  surgicalConsent          ConsentForm? @relation(
+                                "SurgicalConsent",
+                                fields:   [surgicalConsentId],
+                                references: [id]
+                              )
+
+  // ───── Consentimiento de anestesia ─────
+  anesthesiaConsentId      String?   @unique
+  anesthesiaConsent        ConsentForm? @relation(
+                                "AnesthesiaConsent",
+                                fields:   [anesthesiaConsentId],
+                                references: [id]
+                              )
+  anesthesiaInstructions   String?
+  medicationToSuspend      String[]  @default([])
+  anesthesiologistId       String?
+  anesthesiaSignatureImage String?
+  anesthesiaSignedDate     DateTime?
+
+  // Ayuno
+  isInfant                 Boolean   @default(false)
+  fastingSolids            String?
+  fastingClearLiquids      String?
+  fastingCowMilk           String?
+  fastingBreastMilk        String?
+
+  // Relaciones con profesionales
+  surgeon                  Surgeon?          @relation(fields: [surgeonId], references: [id])
+  anesthesiologist         Anesthesiologist? @relation(fields: [anesthesiologistId], references: [id])
+
+  @@unique([email, cedula])
+}
+
+/////////////////////////  ENUMS  ///////////////////////////////
+
+enum ConsentType {
+  SURGICAL
+  ANESTHESIA
+}

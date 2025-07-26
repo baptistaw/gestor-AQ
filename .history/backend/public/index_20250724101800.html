@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Anesthesia Consent Manager</title>
+
+    <!-- Tailwind (ya compilado) -->
+    <link rel="stylesheet" href="/tailwind.css" />
+
+    <!-- Import‑map ESM -->
+    <script type="importmap">
+      {
+        "imports": {
+          "react":             "https://esm.sh/react@18.2.0",
+          "react-dom/client":  "https://esm.sh/react-dom@18.2.0/client",
+          "react/jsx-runtime": "https://esm.sh/react@18.2.0/jsx-runtime",
+          "qrcode.react":      "https://esm.sh/qrcode.react@3.1.0",
+          "qrcode":            "https://esm.sh/qrcode@1.5.1?dts",
+          "@google/genai":     "https://esm.sh/@google/genai@0.12.0",
+          "lucide-react":      "https://esm.sh/lucide-react@0.381.0?bundle",
+          "prop-types":        "https://esm.sh/prop-types@15.8.1",
+          "process":           "https://esm.sh/process@0.11.10"
+        }
+      }
+    </script>
+  </head>
+
+  <body class="bg-slate-50 text-slate-800 antialiased">
+    <div id="root"></div>
+
+    <!-- Config global proporcionada por el backend -->
+    <script src="/config.js"></script>
+
+    <!-- Punto de entrada único de la SPA -->
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

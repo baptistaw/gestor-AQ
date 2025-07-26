@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// ENUMS
+////////////////////////////////////////////////////////////////////////////////
+enum ConsentType {
+  SURGICAL
+  ANESTHESIA
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// MODELOS
+////////////////////////////////////////////////////////////////////////////////
+model Surgeon {
+  id                        String   @id @default(cuid())
+  firstName                 String
+  lastName                  String
+  professionalLicenseNumber String   @unique
+  password                  String
+  specialty                 String
+
+  patients                  Patient[]
+}
+
+model Anesthesiologist {
+  id                        String   @id @default(cuid())
+  firstName                 String
+  lastName                  String
+  professionalLicenseNumber String   @unique
+  password                  String
+
+  patients                  Patient[]
+}
+
+model ConsentForm {
+  id          String        @id @default(cuid())
+  fileName    String
+  fileContent Bytes
+  type        ConsentType
+
+  // Relaciones inversas
+  surgicalPatients   Patient[] @relation("SurgicalConsent")
+  anesthesiaPatients Patient[] @relation("AnesthesiaConsent")
+}
+
+model Patient {
+  // ---------------- Metadatos ----------------
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // ---------------- Datos personales ----------------
+  firstName     String
+  lastName      String
+  email         String
+  cedula        String
+  dateOfBirth   DateTime
+  sex           String
+
+  // ---------------- Cirugía ----------------
+  surgicalProcedure      String?
+  surgeryDateTime        DateTime?
+  surgicalSignatureImage String?
+  surgicalSignedDate     DateTime?
+
+  // ---------------- Anestesia ----------------
+  anesthesiaInstructions   String?
+  medicationToSuspend      String[] @default([])
+  anesthesiaSignatureImage String?
+  anesthesiaSignedDate     DateTime?
+
+  // ---------------- Ayuno ----------------
+  isInfant             Boolean @default(false)
+  fastingSolids        String?
+  fastingClearLiquids  String?
+  fastingCowMilk       String?
+  fastingBreastMilk    String?
+
+  // ---------------- Relaciones ----------------
+  surgeonId            String?
+  surgeon              Surgeon?          @relation(fields: [surgeonId], references: [id])
+
+  anesthesiologistId   String?
+  anesthesiologist     Anesthesiologist? @relation(fields: [anesthesiologistId], references: [id])
+
+  surgicalConsentId    String?   @unique
+  surgicalConsent      ConsentForm?      @relation("SurgicalConsent",   fields: [surgicalConsentId],   references: [id])
+
+  anesthesiaConsentId  String?   @unique
+  anesthesiaConsent    ConsentForm?      @relation("AnesthesiaConsent", fields: [anesthesiaConsentId], references: [id])
+
+  // Índice de inicio de sesión
+  @@unique([email, cedula])
+}

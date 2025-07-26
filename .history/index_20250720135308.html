@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anesthesia Consent Manager</title>
+
+  <!-- Tailwind generado -->
+  <link rel="stylesheet" href="/frontend/dist/tailwind.css" />
+
+  <!-- IMPORT-MAP: TODO el ecosistema apunta a REACT 18.3.0 -->
+<script type="importmap">
+{
+  "imports": {
+    "react":               "https://esm.sh/react@19.1.0",
+    "react/jsx-runtime":   "https://esm.sh/react@19.1.0/jsx-runtime",
+    "react-dom":           "https://esm.sh/react-dom@19.1.0",
+    "react-dom/client":    "https://esm.sh/react-dom@19.1.0/client",
+    "qrcode.react":        "https://esm.sh/qrcode.react@3.1.0"
+  }
+}
+</script>
+
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased">
+  <div id="root"></div>
+
+  <!-- expone window.APP_CONFIG = { API_BASE_URL: ... } -->
+  <script src="/config.js"></script>
+
+  <!-- punto de entrada de la SPA -->
+  <script type="module" src="/index.tsx" crossorigin="anonymous"></script>
+</body>
+</html>

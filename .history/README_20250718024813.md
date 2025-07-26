@@ -1,0 +1,66 @@
+# Backend para el Gestor de Consentimiento de Anestesia
+
+Este directorio contiene el servidor backend para la aplicación, construido con Node.js, Express y Prisma. Ha sido configurado para su despliegue en un entorno de producción.
+
+## 1. Arquitectura y Tecnologías
+
+- **Runtime:** Node.js
+- **Framework:** Express.js
+- **ORM:** Prisma
+- **Base de Datos:** Preparado para **PostgreSQL**.
+- **Módulos:** Configurado para usar Módulos ES (`"type": "module"`).
+
+## 2. Guía de Instalación y Ejecución Local
+
+Sigue estos pasos desde la terminal, **estando dentro de la carpeta `backend/`**:
+
+### Paso 1: Instalar Dependencias
+```bash
+npm install
+```
+
+### Paso 2: Crear Archivo de Entorno (`.env`)
+El servidor y Prisma necesitan una variable de entorno `DATABASE_URL` para conectarse a la base de datos PostgreSQL.
+
+1.  Crea un archivo llamado `.env` en la raíz de la carpeta `backend/`.
+2.  Añade el siguiente contenido, reemplazando los valores con la URL de conexión de tu base de datos PostgreSQL.
+
+    ```
+    # URL de conexión a tu base de datos PostgreSQL
+    DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
+    ```
+
+    **¿De dónde saco esta URL?**
+    -   **Para desarrollo local:** Si tienes PostgreSQL instalado en tu máquina (ej. con Docker), usa tus credenciales locales.
+    -   **Opción recomendada (más fácil):** Puedes usar la URL de la base de datos gratuita que creaste en Render. Ve al panel de control de tu base de datos en Render y copia la **"External Database URL"**.
+
+### Paso 3: Configurar y Migrar la Base de Datos
+Este comando leerá la `DATABASE_URL` de tu archivo `.env` y aplicará el esquema a tu base de datos.
+```bash
+npx prisma migrate dev
+```
+*(Puedes darle el nombre que quieras a la migración, por ejemplo "init").*
+
+### Paso 4: Ejecutar el Servidor de Desarrollo
+Inicia el servidor en modo de desarrollo. Se reiniciará automáticamente con cada cambio.
+```bash
+npm run dev
+```
+El servidor estará corriendo en `http://localhost:4000`.
+
+
+## 3. Despliegue en Render
+
+El proyecto está listo para ser desplegado en [Render](https://render.com/).
+
+1.  **Crea una base de datos PostgreSQL en Render.** Copia la "Internal Database URL".
+2.  **Crea un nuevo "Web Service" en Render** y conéctalo a tu repositorio de GitHub.
+3.  **Configura el servicio:**
+    - **Root Directory:** `backend`
+    - **Build Command:** `sh ./render-build.sh`
+    - **Start Command:** `npm start`
+4.  **Añade la variable de entorno `DATABASE_URL`** y pega la URL de tu base de datos.
+
+El script `render-build.sh` se encargará de instalar dependencias, aplicar las migraciones de la base de datos y compilar el código TypeScript.
+
+Para una guía más detallada, consulta el `README.md` principal del proyecto.
