@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { CameraIcon, CheckIcon, ArrowPathIcon, XMarkIcon } from './icons.tsx';
+import { CameraIcon,  CheckIcon, ArrowPathIcon, XMarkIcon } from './icons.tsx';
 
 interface CameraCaptureProps {
   onConfirm: (signatureImage: string) => void;

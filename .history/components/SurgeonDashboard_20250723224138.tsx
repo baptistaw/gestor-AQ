@@ -19,7 +19,7 @@ import {
 import { QRImg } from './QRImg.tsx';
 import Modal   from './Modal.js';
 
-import { Patient, Surgeon, ConsentData, HealthProvider, AddPatientAndSurgicalConsentData } from '../types.tsx';
+import { Patient, Surgeon, ConsentData, HealthProvider, AddPatientAndSurgicalConsentData } from '../types.ts';
 
 interface Props {
   patients: Patient[];
